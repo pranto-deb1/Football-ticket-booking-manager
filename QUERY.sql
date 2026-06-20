@@ -89,6 +89,45 @@ insert into Bookings (user_id, match_id, seat_number, payment_status, total_cost
 (14, 12, 'M-14', 'Confirmed', 100);
 
 
+-- Query 1: Retrieve all upcoming football matches belonging to the 'Champions League' where the match status is 'Available'.
+select match_id, fixture, base_ticket_price 
+  from Matches 
+  where tournament_category='Champions League' 
+  and match_status = 'Available';
+
+
+-- Query 2: Search for all users whose full names start with 'Tanvir' or contain the phrase 'Haque' (case-insensitive).
+select user_id, full_name, email
+  from Users 
+  where full_name like 'Tanvir%' 
+  or full_name like '%Haque%'
+
+
+-- Query 3: Retrieve all booking records where the payment status is missing (NULL), replacing the empty result with 'Action Required'.
+select booking_id, user_id, match_id, coalesce(payment_status, 'Action Required')
+  as systematic_status 
+  from Bookings 
+  where payment_status is null
+
+
+-- Query 4: Retrieve match booking details along with the User's full name and the scheduled Match fixture teams.
+select booking_id, Users.full_name, Matches.fixture, total_cost from Bookings
+inner join Users on Bookings.user_id = Users.user_id
+inner join Matches on Bookings.match_id = Matches.match_id
+
+
+
+-- Query 5: Display a comprehensive list of all users and their booking IDs, ensuring that fans who have never bought a ticket are still listed.
+select Users.user_id, full_name, Bookings.booking_id from Users
+left join Bookings on Users.user_id = Bookings.user_id
+
+
+-- Query 6: Find all ticket bookings where the total cost is strictly higher than the average cost of all ticket bookings.
+select booking_id, match_id, total_cost from Bookings where total_cost > (select avg(total_cost) from Bookings)
+
+
+-- Query 7: Retrieve the top 2 most expensive matches sorted by base ticket price, skipping the absolute highest premium match.
+select * from Matches order by base_ticket_price desc limit 2 offset 1
 
 
 
